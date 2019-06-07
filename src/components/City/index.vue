@@ -1,23 +1,28 @@
 <template>
     <div class="city_body">
         <div class="city_list">
-            <div class="city_hot">
-                <h2>热门城市</h2>
-                <ul class="clearfix">
-                    <li  v-for="it in hotcities" :key="it.id">{{it.nm}}</li>
-                </ul>
-            </div>
-            <div class="city_sort" ref="case_">
-                <div v-for="it in cities" :key='it.index' >
-                    <h2>{{it.index}}</h2>
-                    <ul>
-                        <li v-for="itc in it.list" :key='itc.id'>{{itc.nm}}</li>
-                    </ul>
+            <Scroller>
+                <div>
+                    <div class="city_hot">
+                        <h2>热门城市</h2>
+                        <ul class="clearfix">
+                            <li  v-for="it in hotcities" :key="it.id" @tap="changeCity(it.nm,it.id)">{{it.nm}}</li>
+                        </ul>
+                    </div>
+                    <div class="city_sort" ref="case_">
+                        <div v-for="it in cities" :key='it.index' >
+                            <h2>{{it.index}}</h2>
+                            <ul>
+                                <li v-for="itc in it.list" :key='itc.id' @tap="changeCity(itc.nm,itc.id)">{{itc.nm}}</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </Scroller>
         </div>
         <div class="city_index">
             <ul>
+                <!-- //touchstart取消了 click 事件延迟 -->
                 <li @touchstart="handleToI(i)" v-for="(it,i) in cities" :key="it.index">{{it.index}}</li>
                 <!--touchstar 移动端触摸事件  -->
             </ul>
@@ -36,15 +41,25 @@ export default {
     components:{
     },
     mounted(){
-        this.axios.get('/api/cityList').then((res)=>{
-            let c = res.data.msg;
-            if(c === 'ok'){
-                var data = res.data.data.cities;
-                var { cities, hotcities} = this.getcities(data);
-                this.cities = cities;
-                this.hotcities = hotcities;
-            }
-        });
+        var cities = window.localStorage.getItem('cities');
+        var hotcities = window.localStorage.getItem('hotcities');
+        if(cities && hotcities){
+            this.cities = JSON.parse(cities);
+            this.hotcities = JSON.parse(hotcities);
+        }else{
+            this.axios.get('/api/cityList').then((res)=>{
+                let c = res.data.msg;
+                if(c === 'ok'){
+                    var data = res.data.data.cities;
+                    var { cities, hotcities} = this.getcities(data);
+                    this.cities = cities;
+                    this.hotcities = hotcities;
+                    //变化不大数据进行本地储存 本地存储是字符串方式  所以用json转换 不会损失格式
+                    window.localStorage.setItem('cities',JSON.stringify(cities));
+                    window.localStorage.setItem('hotcities',JSON.stringify(hotcities));
+                }
+            });
+        }
     },
     methods:{
         getcities(city){
@@ -87,10 +102,15 @@ export default {
                 hotcities
             }
         },
-        handleToI(i){    
+        handleToI(i){
             var h2 = this.$refs.case_.getElementsByTagName('h2');
-            this.$refs.case_.parentNode.scrollTop = h2[i].offsetTop;
-            
+            this.$refs.case_.parentNode.parentNode.parentNode.scrollTop = h2[i].offsetTop;
+        },
+        changeCity(nm,id){
+            this.$store.commit('city/CITY_INFO',{nm, id});
+            window.localStorage.setItem('nowNM',nm);
+            window.localStorage.setItem('nowID',id);
+            this.$router.push('/movie/nowplaying');
         }
     }
 }
