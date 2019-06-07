@@ -3,28 +3,19 @@
         <div class="search_input">
             <div class="search_input_wrapper">
                 <i class="iconfont icon-sousuo"></i>
-                <input type="text">
+                <input type="text" v-model='kw'>
             </div>					
         </div>
         <div class="search_result">
             <h3>电影/电视剧/综艺</h3>
             <ul>
-                <li>
-                    <div class="img"><img src="images/movie_1.jpg"></div>
+                <li v-for="it in moiesList" :key='it.id'>
+                    <div class="img"><img :src="it.img | setWH('128.180')"></div>
                     <div class="info">
-                        <p><span>无名之辈</span><span>8.5</span></p>
-                        <p>A Cool Fish</p>
-                        <p>剧情,喜剧,犯罪</p>
-                        <p>2018-11-16</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="img"><img src="images/movie_1.jpg"></div>
-                    <div class="info">
-                        <p><span>无名之辈</span><span>8.5</span></p>
-                        <p>A Cool Fish</p>
-                        <p>剧情,喜剧,犯罪</p>
-                        <p>2018-11-16</p>
+                        <p><span>{{it.nm}}</span><span>{{it.sc}}</span></p>
+                        <p>{{it.enm}}</p>
+                        <p>{{it.cat}}</p>
+                        <p>{{it.rt}}</p>
                     </div>
                 </li>
             </ul>
@@ -34,8 +25,48 @@
 <script>
 export default {
     name: 'Search',
-    components:{
+    data(){
+        return{
+            kw:'',
+            moiesList:[]
+        };
     },
+    methods:{
+        cancelRequest(){
+            if(typeof this.source === 'function'){
+                this.source('终止请求');
+            }
+        }
+    },
+    watch:{//可以 进行异步操作
+        kw(ac){
+            var that = this;
+            //防止多次搜索 只针对最后一次  终止多次请求
+            //axios取消上一次请求
+            // clearTimeout();
+            // setTimeout();
+            // abort();
+            this.cancelRequest();
+            this.axios.get('/api/searchList?cityId=10&kw='+ac,{
+                cancelToken:new this.axios.CancelToken((c)=>{
+                    that.source = c;
+                })
+            }).then((res)=>{
+                var msg = res.data.msg;
+                var movies = res.data.data.movies;
+                if(movies && msg){
+                    this.moiesList = movies.list;
+                }
+            }).catch((err)=>{
+                // if(this.axios.isCancel(err)){
+                //     // console.log('Request canceled',err.message);
+                //     //如果请求被取消返回取消的值
+                // }else{
+                //     console.log(err);
+                // }
+            });
+        }
+    }
 }
 </script>
 <style scoped>
