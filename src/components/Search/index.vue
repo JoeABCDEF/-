@@ -47,7 +47,7 @@ export default {
             // setTimeout();
             // abort();
             this.cancelRequest();
-            this.axios.get('/api/searchList?cityId=10&kw='+ac,{
+            this.axios.get('/api/searchList?cityId='+this.$store.state.city.id+'&kw='+ac,{
                 cancelToken:new this.axios.CancelToken((c)=>{
                     that.source = c;
                 })
