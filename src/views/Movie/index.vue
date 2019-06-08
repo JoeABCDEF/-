@@ -19,7 +19,7 @@
             </keep-alive>
         </div>
         <TabBar />
-        <!-- <mesBox /> -->
+        <router-view name="detail" />
     </div>
 </template>
 <script>
