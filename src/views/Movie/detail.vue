@@ -5,7 +5,7 @@
         </Header>
 		<div id="content" class="contentDetail">
 			<div class="detail_list">
-				<div class="detail_list_bg"></div>
+				<div class="detail_list_bg" :style="{'background-image': 'url('+img+')'}"></div>
 				<div class="detail_list_filter"></div>
 				<div class="detail_list_content">
 					<div class="detail_list_img">
@@ -45,6 +45,7 @@ export default {
 		return{
 			desc:{},
 			anm:true,
+			img:''
 		};
 	},
     components:{
@@ -56,6 +57,7 @@ export default {
 			if(res.data.msg === 'ok' ){
 				that.desc = res.data.data.detailMovie;
 				this.$nextTick(()=>{
+					that.img = res.data.data.detailMovie.img.replace(/w\.h/,'148.208')
 					new Swiper(this.$refs.detail_player,{
 						slidesPerView : 'auto',
 						freeMode : true,//自由拖拽
