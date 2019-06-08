@@ -5,10 +5,10 @@
             <ul>
                 <li class="pullDown">{{pullDownMsg}}</li>
                 <li v-for="it in movieList" :key='it.id'>
-                    <div class="pic_show" @tap='handleToDesc'>
+                    <div class="pic_show" @tap='handleToDesc(it.id)'>
                         <img :src="it.img | setWH('128.180')">
                     </div>
-                    <div class="info_list" @tap='handleToDesc'>
+                    <div class="info_list" @tap='handleToDesc(it.id)'>
                         <h2>{{it.nm}}<img v-if="it.version" src="@/assets/max.png"></h2>
                         <p>观众评 <span class="grade">{{it.sc}}</span></p>
                         <p>主演: {{it.star}}</p>
@@ -45,15 +45,15 @@ export default {
                         setTimeout(()=>{
                             this.movieList = res.data.data.movieList;
                             this.isLoading = false;
-                        },2000);
+                        },200);
                     }
                 }
             );
         }
     },
     methods:{
-        handleToDesc(){
-            console.log('ass');
+        handleToDesc(id){
+            this.$router.push('/movie/detail/1/'+id);
         },
         handleToScroll(pos){
             //pos 有x y 值

@@ -16,7 +16,7 @@ Vue.component('Loading',Loading);
 
 // "http://p0.meituan.net/w.h/movie/47af2656af6cd0110057bc527b862c665484423.jpg"
 //是吧 w.h 替换成自定的宽高
-Vue.filter('setWH',(url,arg)=>{
+Vue.filter('setWH',(url='',arg)=>{
   return url.replace(/w\.h/,arg);
 });
 
